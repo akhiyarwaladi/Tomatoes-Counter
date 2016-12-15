@@ -4,7 +4,7 @@ import os
 import imutils
 import copy
 
-image = cv2.imread("Maki/ripe-unripe/ru-03.jpg")
+image = cv2.imread("Maki/ripe-unripe/ru-06.jpg")
 clone_img = copy.copy(image)            
 b, g, r = cv2.split(image);
 bl, gr, re = cv2.split(clone_img);
@@ -40,15 +40,17 @@ clone_img = cv2.cvtColor(clone_img, cv2.COLOR_BGR2GRAY)
 cnts = cv2.findContours(image.copy(), cv2.RETR_EXTERNAL,
 	cv2.CHAIN_APPROX_SIMPLE)
 cnts = cnts[0] if imutils.is_cv2() else cnts[1]
-
+idx = 0
 for c in cnts:
 	# compute the center of the contour
+	idx += 1
 	M = cv2.moments(c)
 	cX = int(M["m10"] / M["m00"])
 	cY = int(M["m01"] / M["m00"])
  
 	# draw the contour and center of the shape on the image
 	cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+	cv2.imwrite(str(idx) + '.jpg', image)
 	cv2.circle(image, (cX, cY), 7, (255, 255, 255), -1)
 	cv2.rectangle(image, (cX-30, cY+30), (cX+30, cY-30), (255, 255, 255), 3)
 	cv2.putText(image, "center", (cX - 20, cY - 20),
@@ -58,14 +60,19 @@ cnts2 = cv2.findContours(clone_img.copy(), cv2.RETR_EXTERNAL,
 	cv2.CHAIN_APPROX_SIMPLE)
 cnts2 = cnts2[0] if imutils.is_cv2() else cnts2[1]
 
+idx = 10
 for c in cnts2:
 	# compute the center of the contour
+	idx += 1
+	x,y,w,h = cv2.boundingRect(c)
+	roi=clone_img[y:y+h,x:x+w]
 	M = cv2.moments(c)
 	cX = int(M["m10"] / M["m00"])
 	cY = int(M["m01"] / M["m00"])
  
 	# draw the contour and center of the shape on the image
 	cv2.drawContours(clone_img, [c], -1, (0, 255, 0), 2)
+	cv2.imwrite(str(idx) + '.jpg', roi)
 	cv2.circle(clone_img, (cX, cY), 7, (255, 255, 255), -1)
 	cv2.rectangle(clone_img, (cX-30, cY+30), (cX+30, cY-30), (255, 255, 255), 3)
 	cv2.putText(clone_img, "center", (cX - 20, cY - 20),
